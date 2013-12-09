@@ -1,0 +1,12 @@
+/ebin
+/deps
+erl_crash.dump
+*.ez
+/.env
+
+/Elixir.TapasBootleg.Account.beam
+/Elixir.TapasBootleg.beam
+
+/xmlElement.beam
+/xmlText.beam
+/feed.txt
