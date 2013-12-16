@@ -10,3 +10,5 @@ erl_crash.dump
 /xmlElement.beam
 /xmlText.beam
 /feed.txt
+/_build
+*.beam
