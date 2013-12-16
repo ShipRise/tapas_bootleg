@@ -60,10 +60,11 @@ defmodule TapasBootleg do
   end
 
   def download_video(Episode[filename: filename] = episode) do
-    stream = Stream.resource(fn -> begin_download(episode) end,
-                             &continue_download/1,
-                             &finish_download/1)
-    File.stream_to!(stream, filename)
+    Stream.resource(fn -> begin_download(episode) end,
+                    &continue_download/1,
+                    &finish_download/1)
+    |> File.stream_to!(filename)
+    |> Stream.run
   end
 
   def begin_download(Episode[video_url: video_url,
