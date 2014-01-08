@@ -11,7 +11,7 @@ defmodule TapasBootleg do
 
   @number_pattern %r/
       (?<!\d)                   # preceded by non-digits
-      \d{3}[a-z]?               # exactly three digits in a row
+      \d{3}[a-z]?               # exactly three digits in a row (maybe 1 letter too)
       (?!\d)                    # followed by non-digits
     /x
 
@@ -20,6 +20,24 @@ defmodule TapasBootleg do
   # for more information on OTP Applications
   def start(_type, _args) do
     TapasBootleg.Supervisor.start_link
+  end
+
+  def upload_missing_videos(wistia_project // wistia_project,
+                            episodes // fetch_episodes) do
+    import Enum
+    eps = missing_episodes(wistia_project, episodes)
+    IO.puts "Uploading #{count(eps)} missing episodes"
+
+    each(eps, fn(ep) ->
+                  IO.puts "Grabbing #{ep.name} from DPD"
+                  download_video(ep)
+                  filename = ep.filename
+                  IO.puts "Uploading #{filename} to Wistia"
+                  TapasBootleg.Wistia.upload_file(wistia_project, filename)
+                  IO.puts "Done with #{ep.name}"
+                  IO.puts "Collecting garbage"
+              end)
+    IO.puts "All episodes uploaded"
   end
 
   def login, do: Dotenv.get("DPD_USER_LOGIN") || raise "Missing login"
@@ -39,7 +57,7 @@ defmodule TapasBootleg do
     url = "https://#{subdomain}.dpdcart.com/feed"
     {:ok, 200, _headers, client} = :hackney.get(url, [], "",
                                                  basic_auth: {login, password})
-    {:ok, body, _client} = :hackney.body(client)
+    {:ok, body} = :hackney.body(client)
     {:ok, body}
   end
 
@@ -79,11 +97,10 @@ defmodule TapasBootleg do
 
   def continue_download({client, total_size, size}) do
     case :hackney.stream_body(client) do
-      {:ok, data, client} ->
+      {:ok, data} ->
         new_size = size + size(data)
-        IO.puts "Downloaded #{new_size} of #{total_size}"
         {data, {client, total_size, new_size}}
-      {:done, client} ->
+      :done ->
         IO.puts "No more data"
         nil
       {:error, reason} ->
@@ -122,11 +139,43 @@ defmodule TapasBootleg do
     end
   end
 
+  def missing_episodes(wistia_project // wistia_project,
+                      episodes // fetch_episodes) do
+    import Enum
+    available_numbers = episodes |> map(fn(ep) -> ep.number end) |> HashSet.new
+    uploaded_numbers  = uploaded_episode_numbers(wistia_project) |> HashSet.new
+    missing_numbers   = Set.difference(available_numbers, uploaded_numbers)
+    episodes |> filter(fn(ep) ->
+                           ep.number in missing_numbers
+                       end)
+  end
+
+  def uploaded_episode_numbers(wistia_project // wistia_project) do
+    import TapasBootleg.Wistia
+    wistia_project
+    |> list_project_videos
+    |> Enum.flat_map(fn(title) ->
+                         case Regex.run(@number_pattern, title) do
+                           [number] -> [number]
+                         else []
+                         end
+                     end)
+  end
+
+  def wistia_project(wistia_account // wistia_account) do
+    import TapasBootleg.Wistia
+    wistia_account |> project_for_name("RubyTapas Complete")
+  end
+
   defp find_child(xpath, element, doc) do
     first(:xmerl_xpath.string(xpath, element, element.parents, doc, []))
   end
 
   defp attributes_to_keylist(attr, attrs) do
     Dict.merge(attrs, [{attr.name, to_string(attr.value)}])
+  end
+
+  defp wistia_account do
+    TapasBootleg.Wistia.account
   end
 end

@@ -1,5 +1,7 @@
 [ "dispcount": {:git, "https://github.com/ferd/dispcount.git", "8421fa18d9b5902328c338c331c8a193b8ddb3d2", [{:ref, "1.0.0"}]},
-  "dotenv_elixir": {:git, "git://github.com/avdi/dotenv_elixir.git", "886ff786c36e264c07574d733e96224fcd8d1e51", []},
-  "hackney": {:git, "git://github.com/benoitc/hackney.git", "df90bd8cf4cb7a5e0d6f4bb8286ce9e372deb563", [{:tag, "0.7.0"}]},
+  "dotenv_elixir": {:git, "git://github.com/avdi/dotenv_elixir.git", "d839927eb6a8d86bd024b6bf25ab662de14c80c7", [{:ref, "d839927eb6a8d86bd024b6bf25ab662de14c80c7"}]},
+  "hackney": {:git, "git://github.com/benoitc/hackney.git", "7f2a0b5996313d930277786e7ff5d538e9346547", [{:tag, "0.10.1"}]},
+  "hackney_lib": {:git, "git://github.com/benoitc/hackney_lib.git", "eecdb481f1d38bfb194896bffdf9bdcdd967ae96", [{:tag, "0.2.2"}]},
   "ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "e8ae353c16d4f0897abb9f80025b52925b974dd1", [{:tag, "v4.0.2"}]},
-  "mimetypes": {:git, "https://github.com/spawngrid/mimetypes.git", "47d37a977a7d633199822bf6b08353007483d00f", [{:ref, "master"}]} ]
+  "json": {:git, "git://github.com/cblage/elixir-json.git", "a16a82805771b99fab5b567eb3678bca1dce424e", [{:tag, "v0.2.7"}]},
+  "mimetypes": {:git, "git://github.com/spawngrid/mimetypes.git", "47d37a977a7d633199822bf6b08353007483d00f", [{:ref, "master"}]} ]
